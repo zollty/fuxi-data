@@ -74,7 +74,7 @@ def parse_docs_inner(
                                                                special_loader=special_loader):
         if success:
             file_docs.append(
-                {"f": file, "d": [{"page_content": x.page_content, "metadata": x.metadata} for x in documents]})
+                {"f": file, "d": [{"page_content": str(x.page_content), "metadata": str(x.metadata)} for x in documents]})
             print(f"{file}--------------------------parse file success: ")
             print(file_docs)
             rt_success = True
