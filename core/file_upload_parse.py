@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List, Optional
 import os
 import json
+import datetime, decimal
 from fuxi.utils.runtime_conf import get_temp_dir
 from fuxi.utils.thread_helper import run_in_thread_pool
 from deep_parser.core.document_loaders_helper import load_file_docs, cut_docs
@@ -57,6 +58,23 @@ def parse_files_in_thread(
     for result in run_in_thread_pool(parse_file, params=params):
         yield result
 
+class MyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            print("MyEncoder-datetime.datetime")
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        if isinstance(obj, bytes):
+            return str(obj, encoding='utf-8')
+        if isinstance(obj, int):
+            return int(obj)
+        elif isinstance(obj, float):
+            return float(obj)
+        # elif isinstance(obj, array):
+        #    return obj.tolist()
+        if isinstance(obj, decimal.Decimal):
+            return float(obj)
+        else:
+            return super(MyEncoder, self).default(obj)
 
 def parse_docs_inner(
         files: List[UploadFile] = File(..., description="上传文件，支持多文件"),
@@ -74,7 +92,7 @@ def parse_docs_inner(
                                                                special_loader=special_loader):
         if success:
             file_docs.append(
-                {"f": file, "d": [{"page_content": str(x.page_content), "metadata": str(x.metadata)} for x in documents]})
+                {"f": file, "d": [{"page_content": x.page_content, "metadata": x.metadata} for x in documents]})
             print(f"{file}--------------------------parse file success: ")
             print(file_docs)
             rt_success = True
@@ -83,7 +101,7 @@ def parse_docs_inner(
             print(f"{file}--------------------------parse file failed: ")
             print(msg)
     if rt_success:  # json.dumps(, ensure_ascii=False)
-        strdata = json.dumps({"id": id, "files": file_docs, "failed_files": failed_files}, ensure_ascii=False)
+        strdata = json.dumps({"id": id, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
         return JSONResponse(strdata, status_code=200)
         # return BaseResponse(code=200, msg="文件解析成功", data={"id": id, "files": file_docs, "failed_files": failed_files})
     return JSONResponse({"id": id, "failed_files": failed_files}, status_code=500)
