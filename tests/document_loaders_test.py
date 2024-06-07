@@ -12,3 +12,6 @@ if __name__ == "__main__":
 
     docs = load_file_docs("../conf/shenq.docx", "shenq.docx")
 
+    for doc in docs:
+        print(len(doc.page_content))
+        print(doc.page_content[:200] + "……………………" + doc.page_content[-200:])
