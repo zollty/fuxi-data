@@ -101,10 +101,10 @@ def parse_docs_inner(
             print(f"{file}--------------------------parse file failed: ")
             print(msg)
     if rt_success:  # json.dumps(, ensure_ascii=False)
-        strdata = json.dumps({"id": id, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
+        strdata = json.dumps({"id": id0, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
         return JSONResponse(strdata, status_code=200)
         # return BaseResponse(code=200, msg="文件解析成功", data={"id": id, "files": file_docs, "failed_files": failed_files})
-    return JSONResponse({"id": id, "failed_files": failed_files}, status_code=500)
+    return JSONResponse({"id": id0, "failed_files": failed_files}, status_code=500)
     # return BaseResponse(code=500, msg="解析文件失败", data={"id": id, "failed_files": failed_files})
 
 
