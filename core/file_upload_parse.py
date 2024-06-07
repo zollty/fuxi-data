@@ -73,7 +73,7 @@ def parse_docs_inner(
             file_docs.append(
                 {"f": file, "d": [{"page_content": x.page_content, "metadata": x.metadata} for x in documents]})
             print(f"{file}--------------------------parse file success: ")
-            # print(docs)
+            print(file_docs)
             rt_success = True
         else:
             failed_files.append({file: msg})
