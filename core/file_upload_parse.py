@@ -2,6 +2,7 @@ from fastapi import Body, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 import os
+import json
 from fuxi.utils.runtime_conf import get_temp_dir
 from fuxi.utils.thread_helper import run_in_thread_pool
 from deep_parser.core.document_loaders_helper import load_file_docs, cut_docs
@@ -82,7 +83,9 @@ def parse_docs_inner(
             print(f"{file}--------------------------parse file failed: ")
             print(msg)
     if rt_success:  # json.dumps(, ensure_ascii=False)
-        return JSONResponse({"id": id, "files": file_docs, "failed_files": failed_files}, status_code=200)
+        return JSONResponse(
+            json.dumps({"id": id, "files": file_docs, "failed_files": failed_files}, ensure_ascii=False),
+            status_code=200)
         # return BaseResponse(code=200, msg="文件解析成功", data={"id": id, "files": file_docs, "failed_files": failed_files})
     return JSONResponse({"id": id, "failed_files": failed_files}, status_code=500)
     # return BaseResponse(code=500, msg="解析文件失败", data={"id": id, "failed_files": failed_files})
