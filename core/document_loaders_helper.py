@@ -109,7 +109,17 @@ def load_file_docs(
                                   loader_kwargs=loader_kwargs)
     docs = loader.load()
 
-    # 处理 start_length 位置
+    return cut_docs(docs, start_length)
+
+
+def cut_docs(
+        docs: list,
+        start_length: int = -1,
+):
+    """
+    处理 start_length 位置，裁剪文档（实现分页效果）
+    """
+
     target_docs = []
     if start_length >= 0:
         min_sta = start_length
@@ -146,6 +156,12 @@ def load_file_docs(
         for doc in docs:
             print(len(doc.page_content))
             print(doc.page_content[:200] + "……………………" + doc.page_content[-200:])
+            sl: int = len(doc.page_content)
+            if sl > 200:
+                el: int = sl - 200
+                print(doc.page_content[:180] + "……………………" + doc.page_content[-el:])
+            else:
+                print(doc.page_content)
         print(
             f"↑↑↑↑↑↑↑↑↑↑↑原始文档--------------------------------------start_length={start_length}--------------------")
     return docs
