@@ -59,24 +59,6 @@ def parse_files_in_thread(
     for result in run_in_thread_pool(parse_file, params=params):
         yield result
 
-class MyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            print("MyEncoder-datetime.datetime")
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
-        if isinstance(obj, bytes):
-            return str(obj, encoding='utf-8')
-        if isinstance(obj, int):
-            return int(obj)
-        elif isinstance(obj, float):
-            return float(obj)
-        # elif isinstance(obj, array):
-        #    return obj.tolist()
-        if isinstance(obj, decimal.Decimal):
-            return float(obj)
-        else:
-            return super(MyEncoder, self).default(obj)
-
 def parse_docs_inner(
         files: List[UploadFile] = File(..., description="上传文件，支持多文件"),
         start_size: int = Form(0, description="解析开始的字符位置"),
@@ -101,11 +83,8 @@ def parse_docs_inner(
             failed_files.append({file: msg})
             print(f"{file}--------------------------parse file failed: ")
             print(msg)
-    if rt_success:  # json.dumps(, ensure_ascii=False)
-        # strdata = json.dumps({"id": id0, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
-        # return JSONResponse(strdata, status_code=200)
+    if rt_success:
         return BaseResponse(code=200, msg="文件解析成功", data={"id": id0, "files": file_docs, "failed_files": failed_files})
-    #return JSONResponse({"id": id0, "failed_files": failed_files}, status_code=500)
     return BaseResponse(code=500, msg="解析文件失败", data={"id": id0, "failed_files": failed_files})
 
 
