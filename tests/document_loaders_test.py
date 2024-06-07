@@ -10,5 +10,5 @@ sys.path.append(runtime_root_dir)
 if __name__ == "__main__":
     from deep_parser.core.document_loaders_helper import load_file_docs
 
-    docs = load_file_docs("./conf/llm_model.yml", "llm_model.yml")
+    docs = load_file_docs("./conf/shenq.docx", "shenq.docx")
 
