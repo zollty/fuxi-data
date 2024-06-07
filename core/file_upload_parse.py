@@ -6,6 +6,7 @@ import json
 import datetime, decimal
 from fuxi.utils.runtime_conf import get_temp_dir
 from fuxi.utils.thread_helper import run_in_thread_pool
+from fuxi.utils.api_base import (BaseResponse, ListResponse)
 from deep_parser.core.document_loaders_helper import load_file_docs, cut_docs
 from deep_parser.document_loaders import *
 
@@ -80,7 +81,7 @@ def parse_docs_inner(
         files: List[UploadFile] = File(..., description="上传文件，支持多文件"),
         start_size: int = Form(0, description="解析开始的字符位置"),
         special_loader: str = None,
-) -> JSONResponse:
+) -> BaseResponse:
     failed_files = []
     file_docs = []
     path, id0 = get_temp_dir()
@@ -101,22 +102,22 @@ def parse_docs_inner(
             print(f"{file}--------------------------parse file failed: ")
             print(msg)
     if rt_success:  # json.dumps(, ensure_ascii=False)
-        strdata = json.dumps({"id": id0, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
-        return JSONResponse(strdata, status_code=200)
-        # return BaseResponse(code=200, msg="文件解析成功", data={"id": id, "files": file_docs, "failed_files": failed_files})
-    return JSONResponse({"id": id0, "failed_files": failed_files}, status_code=500)
-    # return BaseResponse(code=500, msg="解析文件失败", data={"id": id, "failed_files": failed_files})
+        # strdata = json.dumps({"id": id0, "files": file_docs, "failed_files": failed_files}, cls=MyEncoder, ensure_ascii=False)
+        # return JSONResponse(strdata, status_code=200)
+        return BaseResponse(code=200, msg="文件解析成功", data={"id": id0, "files": file_docs, "failed_files": failed_files})
+    #return JSONResponse({"id": id0, "failed_files": failed_files}, status_code=500)
+    return BaseResponse(code=500, msg="解析文件失败", data={"id": id0, "failed_files": failed_files})
 
 
 def parse_docs(
         files: List[UploadFile] = File(..., description="上传文件，支持多文件"),
         start_size: int = Form(0, description="解析开始的字符位置"),
-) -> JSONResponse:
+) -> BaseResponse:
     return parse_docs_inner(files, start_size)
 
 
 def parse_docs_rapid_ocr_pdf(
         files: List[UploadFile] = File(..., description="上传文件，支持多文件"),
         start_size: int = Form(0, description="解析开始的字符位置"),
-) -> JSONResponse:
+) -> BaseResponse:
     return parse_docs_inner(files, start_size, "rapid_ocr_pdf")
